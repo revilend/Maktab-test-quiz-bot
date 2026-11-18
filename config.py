@@ -21,5 +21,10 @@ TIMEOUT_PER_QUESTION = int(os.getenv("TIMEOUT_PER_QUESTION", "30"))
 
 WEBAPP_URL = os.getenv("WEBAPP_URL", "").strip()
 
+PORT = int(os.getenv("PORT", "8080"))
+
+_gemini_keys_raw = os.getenv("GEMINI_API_KEYS", "") or os.getenv("GEMINI_API_KEY", "")
+GEMINI_API_KEYS = [k.strip() for k in _gemini_keys_raw.split(",") if k.strip()]
+
 if not BOT_TOKEN:
     raise RuntimeError("BOT_TOKEN .env faylda topilmadi")

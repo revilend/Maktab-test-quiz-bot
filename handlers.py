@@ -8,7 +8,9 @@ from pathlib import Path
 from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    KeyboardButton,
     Poll,
+    ReplyKeyboardMarkup,
     Update,
     WebAppInfo,
 )
@@ -18,6 +20,7 @@ from telegram.error import BadRequest
 
 import database as db
 from config import ADMIN_IDS, SUBJECTS_DIR, TIMEOUT_PER_QUESTION, WEBAPP_URL
+from ai_generator import extract_text_from_file, generate_quiz_txt
 from parser import list_subjects, load_subject
 
 log = logging.getLogger(__name__)
@@ -44,6 +47,32 @@ def main_menu_kb(user_id: int) -> InlineKeyboardMarkup:
     if is_admin(user_id):
         rows.append([InlineKeyboardButton("👑 Admin panel", callback_data="admin:home")])
     return InlineKeyboardMarkup(rows)
+
+
+
+def reply_menu_kb(user_id: int) -> ReplyKeyboardMarkup:
+    rows = []
+    if WEBAPP_URL:
+        rows.append([
+            KeyboardButton("📝 Test boshlash"),
+            KeyboardButton("🌐 Mini App", web_app=WebAppInfo(url=WEBAPP_URL)),
+        ])
+    else:
+        rows.append([KeyboardButton("📝 Test boshlash")])
+    rows.append([KeyboardButton("📊 Mening natijalarim"), KeyboardButton("🏆 Top natijalar")])
+    rows.append([KeyboardButton("⚙️ Sozlamalar"), KeyboardButton("ℹ️ Bot haqida")])
+    if is_admin(user_id):
+        rows.append([KeyboardButton("🤖 AI Test tuzish"), KeyboardButton("👑 Admin panel")])
+    return ReplyKeyboardMarkup(rows, resize_keyboard=True, is_persistent=True)
+
+
+class _MsgAsQuery:
+    """Adapter so inline menu helpers can reply directly to a bottom-keyboard press."""
+    def __init__(self, message):
+        self._msg = message
+
+    async def edit_message_text(self, text: str, **kwargs):
+        return await self._msg.reply_text(text, **kwargs)
 
 
 def back_kb() -> InlineKeyboardMarkup:
@@ -103,7 +132,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
     await update.message.reply_text(
         text,
-        reply_markup=main_menu_kb(user.id),
+        reply_markup=reply_menu_kb(user.id),
         parse_mode=ParseMode.MARKDOWN,
     )
 
@@ -143,7 +172,7 @@ async def cmd_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     await update.message.reply_text(
         "Bosh menyu:",
-        reply_markup=main_menu_kb(user.id),
+        reply_markup=reply_menu_kb(user.id),
     )
 
 
@@ -1056,7 +1085,9 @@ def _admin_kb() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("👥 Foydalanuvchilar", callback_data="admin:users")],
         [InlineKeyboardButton("🏆 Eng yaxshi natijalar", callback_data="admin:top")],
         [InlineKeyboardButton("📚 Fanlar ro'yxati", callback_data="admin:subjects")],
-        [InlineKeyboardButton("➕ Yangi fan qo'shish", callback_data="admin:addsubject")],
+        [InlineKeyboardButton("🤖 AI bilan test tuzish", callback_data="admin:aitest")],
+        [InlineKeyboardButton("➕ Yangi fan qo'shish (.txt)", callback_data="admin:addsubject")],
+        [InlineKeyboardButton("📥 Excel natijalar (.xlsx)", callback_data="admin:exportxlsx")],
         [InlineKeyboardButton("📢 Hammaga xabar yuborish", callback_data="admin:broadcast")],
         [InlineKeyboardButton("⬅️ Bosh menyu", callback_data="menu:home")],
     ])
@@ -1077,6 +1108,48 @@ async def on_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             reply_markup=_admin_kb(),
             parse_mode=ParseMode.MARKDOWN,
         )
+
+    elif action == "aitest":
+        context.user_data["awaiting_ai_topic"] = True
+        context.user_data["awaiting_subject_file"] = False
+        await q.edit_message_text(
+            "🤖 *AI Test Generator*\n\n"
+            "Mavzuga oid **PDF, Word (.docx), .txt** fayl yuboring *yoki* mavzu nomini yozing\n"
+            "_(masalan: 8-sinf Fizika: Nyuton qonunlari)_.",
+            reply_markup=_admin_back_kb(),
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        return
+
+    elif action == "exportxlsx":
+        import io
+        from openpyxl import Workbook
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Natijalar"
+        ws.append(["ID", "User ID", "Ism", "Username", "Fan", "To'g'ri", "Jami", "Foiz (%)", "Sana"])
+        with db.get_conn() as conn:
+            rows = conn.execute(
+                """
+                SELECT a.id, a.user_id, u.first_name, u.last_name, u.username,
+                       a.subject, a.correct, a.total, a.finished_at
+                FROM attempts a
+                LEFT JOIN users u ON u.user_id = a.user_id
+                WHERE a.finished_at IS NOT NULL
+                ORDER BY a.finished_at DESC
+                """
+            ).fetchall()
+        for r in rows:
+            total = r["total"] or 1
+            pct = round((r["correct"] / total) * 100, 1)
+            full_name = " ".join(filter(None, [r["first_name"] or "", r["last_name"] or ""])).strip() or "—"
+            uname = f"@{r['username']}" if r["username"] else ""
+            ws.append([r["id"], r["user_id"], full_name, uname, r["subject"], r["correct"], r["total"], pct, (r["finished_at"] or "")[:19].replace("T", " ")])
+        buf = io.BytesIO()
+        wb.save(buf)
+        buf.seek(0)
+        await q.message.reply_document(document=buf, filename="test_natijalari.xlsx", caption="📊 Barcha test natijalari (Excel)")
+        return
 
     elif action == "stats":
         s = db.stats_overview()
@@ -1319,7 +1392,46 @@ async def _admin_user_profile(q, user_id: int) -> None:
 async def on_document(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle file upload from admin to add a new subject."""
     user = update.effective_user
-    if not is_admin(user.id) or not context.user_data.get("awaiting_subject_file"):
+    if not is_admin(user.id):
+        return
+
+    if context.user_data.get("awaiting_ai_topic"):
+        doc = update.message.document
+        suffix = Path(doc.file_name or "").suffix.lower()
+        if suffix not in (".pdf", ".docx", ".txt", ".md"):
+            await update.message.reply_text("❌ AI uchun .pdf, .docx yoki .txt fayl yuboring.")
+            return
+        wait_msg = await update.message.reply_text("⏳ Fayl o'qilmoqda va AI test tuzmoqda...")
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+            tmp_path = Path(tmp.name)
+        try:
+            tg_file = await doc.get_file()
+            await tg_file.download_to_drive(custom_path=tmp_path)
+            text_content = extract_text_from_file(tmp_path)
+            generated = await generate_quiz_txt(text_content, num_questions=10)
+            stem = "".join(c if c.isalnum() or c in "_-" else "_" for c in Path(doc.file_name).stem.lower()).strip("_") or "ai_test"
+            dest = SUBJECTS_DIR / f"{stem}.txt"
+            if dest.exists():
+                dest = SUBJECTS_DIR / f"{stem}_{random.randint(100, 999)}.txt"
+            dest.write_text(generated, encoding="utf-8")
+            qs = load_subject(dest)
+            if not qs:
+                dest.unlink(missing_ok=True)
+                await wait_msg.edit_text("❌ AI javobidan savol ajratib bo'lmadi, qayta urining.")
+                return
+            context.user_data["awaiting_ai_topic"] = False
+            await wait_msg.edit_text(
+                f"✅ *{dest.name}* yaratildi!\n📝 Savollar soni: *{len(qs)}*\n\nEndi «📝 Test boshlash» orqali ishlashingiz mumkin.",
+                parse_mode=ParseMode.MARKDOWN,
+            )
+        except Exception as e:
+            await wait_msg.edit_text(f"❌ Xato: {e}")
+        finally:
+            tmp_path.unlink(missing_ok=True)
+        return
+
+    if not context.user_data.get("awaiting_subject_file"):
         return
 
     doc = update.message.document
@@ -1404,5 +1516,68 @@ async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         )
         return
 
+    if context.user_data.get("awaiting_ai_topic") and is_admin(user.id):
+        context.user_data["awaiting_ai_topic"] = False
+        wait_msg = await update.message.reply_text("⏳ AI mavzu bo'yicha test tuzmoqda...")
+        try:
+            generated = await generate_quiz_txt(text, num_questions=10)
+            raw_stem = "_".join(text.strip().split()[:3]).lower()
+            stem = "".join(c if c.isalnum() or c in "_-" else "_" for c in raw_stem).strip("_") or "ai_mavzu"
+            dest = SUBJECTS_DIR / f"{stem}.txt"
+            if dest.exists():
+                dest = SUBJECTS_DIR / f"{stem}_{random.randint(100, 999)}.txt"
+            dest.write_text(generated, encoding="utf-8")
+            qs = load_subject(dest)
+            if not qs:
+                dest.unlink(missing_ok=True)
+                await wait_msg.edit_text("❌ AI javobidan savol ajratib bo'lmadi, qayta urining.")
+                return
+            await wait_msg.edit_text(
+                f"✅ *{dest.name}* yaratildi!\n📝 Savollar soni: *{len(qs)}*",
+                parse_mode=ParseMode.MARKDOWN,
+            )
+        except Exception as e:
+            await wait_msg.edit_text(f"❌ Xato: {e}")
+        return
+
+    # Bottom ReplyKeyboard routing
+    fake_q = _MsgAsQuery(update.message)
+    if text == "📝 Test boshlash":
+        await _show_subjects(fake_q)
+        return
+    if text == "📊 Mening natijalarim":
+        await _show_my_results(fake_q, user.id)
+        return
+    if text == "🏆 Top natijalar":
+        await _show_top(fake_q)
+        return
+    if text == "⚙️ Sozlamalar":
+        await _show_settings(fake_q, user.id)
+        return
+    if text == "ℹ️ Bot haqida":
+        await update.message.reply_text(
+            "ℹ️ *Bot haqida*\n\n"
+            "Maktab o'qituvchilari va o'quvchilari uchun test boti.\n"
+            "• AI yordamida PDF/Word/mavzudan test tuzish\n"
+            "• Mini App va guruh kvizlari\n"
+            "• Excel hisobot va reyting",
+            parse_mode=ParseMode.MARKDOWN,
+            reply_markup=reply_menu_kb(user.id),
+        )
+        return
+    if text == "🤖 AI Test tuzish" and is_admin(user.id):
+        context.user_data["awaiting_ai_topic"] = True
+        context.user_data["awaiting_subject_file"] = False
+        await update.message.reply_text(
+            "🤖 *AI Test Generator*\n\n"
+            "Mavzuga oid **PDF, Word (.docx), .txt** fayl yuboring *yoki* mavzu nomini yozing\n"
+            "_(masalan: 8-sinf Fizika: Nyuton qonunlari)_.",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        return
+    if text == "👑 Admin panel" and is_admin(user.id):
+        await cmd_admin(update, context)
+        return
+
     # default: show menu
-    await update.message.reply_text("Bosh menyu:", reply_markup=main_menu_kb(user.id))
+    await update.message.reply_text("Bosh menyu:", reply_markup=reply_menu_kb(user.id))

@@ -12,7 +12,7 @@ from telegram.ext import (
 
 import database as db
 import handlers as h
-from config import BOT_TOKEN
+from config import BOT_TOKEN, PORT
 from webapp import start_webapp
 
 logging.basicConfig(
@@ -53,13 +53,13 @@ async def main() -> None:
 
     app = build_app()
 
-    web_runner = await start_webapp(host="0.0.0.0", port=8080)
+    web_runner = await start_webapp(host="0.0.0.0", port=PORT)
 
     await app.initialize()
     await app.start()
     await app.updater.start_polling(allowed_updates=["message", "callback_query", "poll_answer"])
 
-    log.info("Bot va WebApp ishga tushdi...")
+    log.info(f"Bot va WebApp port {PORT} da ishga tushdi...")
 
     try:
         await asyncio.Event().wait()
