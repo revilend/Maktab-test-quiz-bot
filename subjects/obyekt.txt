@@ -1,0 +1,359 @@
+1. Python'da vorislik (inheritance) nima?
+A) Kodni yashirish
++B) Bir klass boshqa klassdan xususiyat va metodlarni meros olishi
+C) Xatolarni topish
+D) Funksiya yaratish
+
+2. Ota klass boshqa qanday nom bilan ataladi?
+A) Child class
+B) Derived class
++C) Super class
+D) Object
+
+3. class Qilichboz(Jangchi): yozuvi nimani bildiradi?
+A) Qilichboz mustaqil klass
++B) Qilichboz Jangchi klassidan voris olgan
+C) Jangchi Qilichbozdan voris olgan
+D) Xato yozilgan kod
+
+4. Vorislikning asosiy afzalligi nima?
++A) Kodni qisqartirish va qayta ishlatish
+B) Kompyuterni tezlatish
+C) Internetni ulash
+D) Fayl ochish
+
+5. super() funksiyasi nima uchun ishlatiladi?
+A) Ekranni tozalash uchun
++B) Ota klass metodlarini chaqirish uchun
+C) Yangi klass yaratish uchun
+D) Obyektni o'chirish uchun
+
+6. Polimorfizm nima?
++A) Bir xil metodning turli klasslarda turlicha ishlashi
+B) Kodni yashirish
+C) Faylni nusxalash
+D) Dasturdan chiqish
+
+7. Quyidagilardan qaysi biri voris klass hisoblanadi?
+A) Jangchi
+B) Object
++C) Qilichboz
+D) Python
+
+8. override qilish nima?
+A) Yangi fayl yaratish
++B) Ota klass metodini qayta yozish
+C) Kodni o'chirish
+D) Klassni yopish
+
+9. self kalit so'zi nimani bildiradi?
+A) Klass nomini
++B) Joriy obyektni
+C) Funksiyani
+D) Modullarni
+
+10. __init__() metodining vazifasi nima?
+A) Dastur tugatish
++B) Obyekt yaratilganda boshlang'ich qiymat berish
+C) Fayl ochish
+D) Kodni kompilyatsiya qilish
+
+11. Quyidagilardan qaysi biri polimorfizmga misol bo'ladi?
++A) Har xil klasslarda hujum() metodining turlicha ishlashi
+B) Fayl yaratish
+C) O'zgaruvchi e'lon qilish
+D) Sonlarni qo'shish
+
+12. pass operatori nima vazifa bajaradi?
+A) Kodni to'xtatadi
++B) Hech qanday amal bajarmaydi
+C) Obyekt yaratadi
+D) Funksiya chaqiradi
+
+13. Qaysi klassda mana xususiyati mavjud edi?
+A) Kamonchi
+B) Jangchi
++C) Sehrgar
+D) Qilichboz
+
+14. Kamonchi klassidagi oq_soni nimani bildiradi?
+A) Jon miqdorini
+B) Qilich kuchini
++C) O'qlar sonini
+D) Sehr kuchini
+
+15. OOP'da vorislik va polimorfizm nimani ta'minlaydi?
+A) Kodni murakkablashtiradi
++B) Kodni moslashuvchan va kengaytiriladigan qiladi
+C) Internet tezligini oshiradi
+D) Operatsion tizim o'rnatadi
+
+16. Inkapsulyatsiya nima?
+A) Fayl ochish usuli
++B) Ma'lumot va metodlarni bitta obyekt ichida birlashtirish
+C) Internetga ulanish
+D) Grafik chizish
+
+17. Inkapsulyatsiyaning asosiy maqsadi nima?
+A) Kompyuterni tezlatish
++B) Ma'lumotlarni himoya qilish
+C) O'yin yaratish
+D) Printer ulash
+
+18. private xususiyatga qayerdan murojaat qilish mumkin?
+A) Istalgan joydan
++B) Faqat klass ichidan
+C) Faqat internetdan
+D) Faqat boshqa dasturdan
+
+19. Getter metodining vazifasi nima?
+A) Qiymatni o'chirish
++B) Qiymatni qaytarish
+C) Kodni yopish
+D) Obyekt yaratish
+
+20. Setter metodining vazifasi nima?
++A) Qiymatni tekshirib o'rnatish
+B) Fayl yaratish
+C) Dasturni tugatish
+D) Ekranni tozalash
+
+21. Klassning xususiyatlari nima uchun ishlatiladi?
++A) Ma'lumotlarni saqlash uchun
+B) O'yin o'ynash uchun
+C) Video ko'rish uchun
+D) Internet tezligini oshirish uchun
+
+22. __init__() metodi qachon ishlaydi?
+A) Dastur yopilganda
++B) Obyekt yaratilganda
+C) Internet ulanganda
+D) Fayl o'chirilganda
+
+23. self parametri nimani bildiradi?
+A) Klass nomini
++B) Joriy obyektni
+C) Funksiya nomini
+D) Modulni
+
+24. Public xususiyat qanday bo'ladi?
+A) Faqat klass ichida ishlaydi
++B) Tashqaridan foydalanish mumkin
+C) Hech qayerda ishlamaydi
+D) Faqat voris klassda ishlaydi
+
+25. @classmethod dekoratori nimaga tegishli?
+A) Instance metodga
+B) Static metodga
++C) Class metodga
+D) Constructor metodga
+
+26. Static metodning asosiy xususiyati nima?
+A) Obyekt ma'lumotlariga murojaat qiladi
++B) Klassga bog'liq mustaqil metod bo'ladi
+C) Faqat private ishlaydi
+D) Obyekt yaratadi
+
+27. Bank hisobi klassidagi deposit() metodi nima qiladi?
+A) Pul yechadi
+B) Hisobni yopadi
++C) Hisobga pul qo'shadi
+D) Parolni o'zgartiradi
+
+28. withdraw() metodining vazifasi nima?
+A) Hisobga pul qo'shish
++B) Hisobdan pul yechish
+C) Yangi hisob ochish
+D) Klass yaratish
+
+29. Constructor metodining asosiy vazifasi nima?
++A) Obyektni boshlang'ich qiymatlar bilan yaratish
+B) Kodni o'chirish
+C) Dasturdan chiqish
+D) Internetga ulanish
+
+30. Inkapsulyatsiyaning afzalliklaridan biri qaysi?
++A) Kodni himoyalash va modullarga ajratish
+B) Kompyuterni formatlash
+C) Fayl hajmini oshirish
+D) Operatsion tizim o'rnatish
+
+31. Fayl nima?
+A) Grafik karta
++B) Ma'lumotlarni saqlash vositasi
+C) Operatsion tizim
+D) Internet dasturi
+
+32. Python'da fayl ochish uchun qaysi funksiya ishlatiladi?
+A) file()
++B) open()
+C) read()
+D) close()
+
+33. "r" rejimi nima uchun ishlatiladi?
+A) Faylga yozish uchun
++B) Faylni o'qish uchun
+C) Faylni o'chirish uchun
+D) Faylni nusxalash uchun
+
+34. "w" rejimi qanday vazifa bajaradi?
+A) Faylni o'qiydi
++B) Faylga yozadi va eski ma'lumotni o'chiradi
+C) Faylni yopadi
+D) Faylni yashiradi
+
+35. "a" rejimining vazifasi nima?
+A) Faylni o'chirish
++B) Faylga yangi ma'lumot qo'shish
+C) Faylni o'qish
+D) Faylni himoyalash
+
+36. read() funksiyasi nima qiladi?
+A) Faylni yopadi
++B) Butun faylni o'qiydi
+C) Fayl yaratadi
+D) Faylni nusxalaydi
+
+37. readline() funksiyasi nima qiladi?
+A) Barcha qatorlarni o'qiydi
++B) Bitta qatorni o'qiydi
+C) Faylni o'chiradi
+D) Yangi fayl yaratadi
+
+38. readlines() funksiyasi qanday natija qaytaradi?
+A) Son
+B) Bitta harf
++C) Barcha qatorlarni ro'yxat shaklida
+D) Boolean qiymat
+
+39. Fayl bilan ishlash tugagach nima qilish kerak?
+A) Kompyuterni o'chirish
++B) Faylni yopish
+C) Internetni uzish
+D) Kodni o'chirish
+
+40. Faylni avtomatik yopish uchun qaysi operator tavsiya etiladi?
+A) for
+B) while
++C) with
+D) if
+
+41. JSON formatining afzalligi nima?
++A) Strukturaviy ma'lumotlarni saqlaydi
+B) Faqat rasm saqlaydi
+C) Internetni tezlashtiradi
+D) Audio yozadi
+
+42. CSV fayllari asosan nima uchun ishlatiladi?
+A) Video saqlash uchun
++B) Jadval ma'lumotlari uchun
+C) O'yin yaratish uchun
+D) Operatsion tizim uchun
+
+43. FileNotFoundError xatosi qachon yuz beradi?
+A) Internet bo'lmaganda
++B) Fayl topilmaganda
+C) Kod uzun bo'lganda
+D) Kompyuter o'chganda
+
+44. Faylga son yozishda nima qilish kerak?
+A) Sonni listga aylantirish
++B) Sonni str() orqali matnga aylantirish
+C) Sonni o'chirish
+D) Sonni ikkiga bo'lish
+
+45. Binar format asosan qaysi fayllar uchun ishlatiladi?
+A) Matnli fayllar
+B) Jadval fayllari
++C) Tasvir, audio va video fayllar
+D) HTML fayllar
+
+46. Django nima?
+A) Operatsion tizim
++B) Python frameworki
+C) Grafik dastur
+D) Brauzer
+
+47. Django frameworki asosan nima uchun ishlatiladi?
++A) Web ilovalar yaratish uchun
+B) Video montaj uchun
+C) O'yin o'ynash uchun
+D) Antivirus yaratish uchun
+
+48. Django qaysi dasturlash tiliga asoslangan?
+A) Java
+B) C++
++C) Python
+D) PHP
+
+49. Django'da yangi loyiha yaratish buyrug'i qaysi?
+A) django start
++B) django-admin startproject
+C) python newproject
+D) start django
+
+50. Django'da ilova yaratish uchun qaysi buyruq ishlatiladi?
++A) python manage.py startapp
+B) django new app
+C) create app
+D) makeapp
+
+51. Django'da manage.py faylining vazifasi nima?
+A) Video ochish
++B) Loyihani boshqarish
+C) Grafik chizish
+D) Internetni ulash
+
+52. Django'ning asosiy afzalligi nima?
++A) Tez va xavfsiz web ilova yaratish
+B) Kompyuterni tezlatish
+C) O'yin yaratish
+D) Musiqa tinglash
+
+53. Django'da ma'lumotlar bazasi bilan ishlash uchun nima ishlatiladi?
++A) ORM
+B) HTML
+C) CSS
+D) Compiler
+
+54. ORM nimani anglatadi?
+A) Online Resource Manager
++B) Object Relational Mapping
+C) Open Random Method
+D) Object Reading Mode
+
+55. Django'da foydalanuvchi interfeysi qaysi texnologiya orqali yaratiladi?
+A) TXT
++B) HTML template
+C) MP3
+D) Excel
+
+56. Django'da URL manzillar qaysi faylda yoziladi?
+A) models.py
+B) admin.py
++C) urls.py
+D) forms.py
+
+57. views.py faylining vazifasi nima?
++A) Ma'lumotlarni ekranga chiqarish logikasini boshqarish
+B) Musiqa saqlash
+C) Operatsion tizimni yuklash
+D) Printer boshqarish
+
+58. Django'da model nima?
+A) Grafik dizayn
++B) Ma'lumotlar bazasi jadvali modeli
+C) Video format
+D) Brauzer oynasi
+
+59. Django admin paneli nima uchun kerak?
++A) Ma'lumotlarni boshqarish uchun
+B) O'yin o'ynash uchun
+C) Internetni sozlash uchun
+D) Kompyuterni o'chirish uchun
+
+60. Django'da serverni ishga tushirish uchun qaysi buyruq ishlatiladi?
+A) python run
+B) django startserver
++C) python manage.py runserver
+D) start server
