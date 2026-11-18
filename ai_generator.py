@@ -12,7 +12,11 @@ from config import GEMINI_API_KEYS
 
 log = logging.getLogger(__name__)
 
-GEMINI_MODEL = "gemini-3.8-flash"
+GEMINI_MODELS = [
+    "gemini-3.8-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-2.0-flash",
+]
 GEMINI_URL = (
     f"https://generativelanguage.googleapis.com/v1beta/models/"
     f"{GEMINI_MODEL}:generateContent"
