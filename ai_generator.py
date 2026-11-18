@@ -17,10 +17,6 @@ GEMINI_MODELS = [
     "gemini-2.5-flash-lite",
     "gemini-2.0-flash",
 ]
-GEMINI_URL = (
-    f"https://generativelanguage.googleapis.com/v1beta/models/"
-    f"{GEMINI_MODEL}:generateContent"
-)
 
 
 def extract_text_from_file(path: Path) -> str:
@@ -57,7 +53,7 @@ async def generate_quiz_txt(
     difficulty: str = "o'rta",
     language: str = "o'zbek",
 ) -> str:
-    """Call Gemini API (with key rotation) to generate questions in parser.py format."""
+    """Call Gemini API (with model fallback & key rotation) to generate questions."""
     if not GEMINI_API_KEYS:
         raise RuntimeError(
             "GEMINI_API_KEY yoki GEMINI_API_KEYS topilmadi. .env yoki Render sozlamalariga qo'shing."
@@ -92,28 +88,27 @@ async def generate_quiz_txt(
 
     last_err = "Noma'lum xato"
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=60)) as session:
-        for key in GEMINI_API_KEYS:
-            try:
-                async with session.post(
-                    GEMINI_URL,
-                    params={"key": key},
-                    json=payload,
-                ) as resp:
-                    if resp.status == 429:
-                        last_err = "API limit (429), keyingi kalitga o'tilmoqda"
-                        continue
-                    data = await resp.json()
-                    if resp.status != 200:
-                        last_err = data.get("error", {}).get("message", f"HTTP {resp.status}")
-                        continue
-                    candidates = data.get("candidates") or []
-                    if not candidates:
-                        last_err = "AI javob qaytarmadi"
-                        continue
-                    text = candidates[0]["content"]["parts"][0]["text"]
-                    return _clean_generated_text(text)
-            except Exception as e:
-                last_err = str(e)
-                continue
+        for model in GEMINI_MODELS:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+            for key in GEMINI_API_KEYS:
+                try:
+                    async with session.post(url, params={"key": key}, json=payload) as resp:
+                        if resp.status in (429, 503):
+                            last_err = f"{model} band ({resp.status})"
+                            continue
+                        data = await resp.json()
+                        if resp.status != 200:
+                            last_err = data.get("error", {}).get("message", f"HTTP {resp.status}")
+                            continue
+                        candidates = data.get("candidates") or []
+                        if not candidates:
+                            last_err = "AI javob qaytarmadi"
+                            continue
+                        text = candidates[0]["content"]["parts"][0]["text"]
+                        return _clean_generated_text(text)
+                except Exception as e:
+                    last_err = str(e)
+                    continue
 
     raise RuntimeError(f"Gemini API xatosi: {last_err}")
+    
