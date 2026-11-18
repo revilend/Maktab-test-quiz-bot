@@ -14,9 +14,11 @@ log = logging.getLogger(__name__)
 
 GEMINI_MODELS = [
     "gemini-3.8-flash",
-    "gemini-2.5-flash-lite",
-    "gemini-2.0-flash",
+    "gemini-3.7-flash",
+    "gemini-3.6-flash",
+    "gemini-3.5-flash-lite",
 ]
+
 
 
 def extract_text_from_file(path: Path) -> str:
